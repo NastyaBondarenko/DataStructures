@@ -7,12 +7,23 @@ import java.util.StringJoiner;
 
 public class ArrayList<T> implements List<T> {
     private static final int DEFAULT_INITIAL_CAPACITY = 10;
-    private static final int DEFAULT_GROWTH_FACTOR = 2;
-    private T array[];
-    int size;
+    private static final double DEFAULT_GROWTH_FACTOR = 2.5;
+    private T[] array;
+    private int size;
+
+    private double loadFactor;
 
     public ArrayList() {
-        array = (T[]) new Object[DEFAULT_INITIAL_CAPACITY];
+        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_GROWTH_FACTOR);
+    }
+
+    public ArrayList(int DEFAULT_INITIAL_CAPACITY) {
+        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_GROWTH_FACTOR);
+    }
+
+    public ArrayList(int DEFAULT_INITIAL_CAPACITY, double loadFactor) {
+        this.loadFactor = loadFactor < 1 ? DEFAULT_GROWTH_FACTOR : loadFactor;
+        this.array = (T[]) new Object[DEFAULT_INITIAL_CAPACITY];
     }
 
     @Override
@@ -22,14 +33,9 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public void add(T value, int index) {
-        validateIndex(index);
-        checkCapacity();
-        T[] newArray = (T[]) new Object[array.length * DEFAULT_GROWTH_FACTOR];
-        for (int i = 0; i < array.length; i++) {
-            newArray[i] = array[i];
-            System.arraycopy(array, index, newArray, index + 1, size);
-        }
-        array = newArray;
+        validateIndexForAdd(index);
+        ensureCapacity();
+        System.arraycopy(array, index, array, index + 1, size - index);
         array[index] = value;
         size++;
     }
@@ -37,31 +43,25 @@ public class ArrayList<T> implements List<T> {
     @Override
     public T remove(int index) {
         validateIndex(index);
-        checkCapacity();
-        for (int i = 0; i < array.length - 1; i++) {
-            if (i == index) {
-                array[index] = array[index + 1];
-                T[] newArray = (T[]) new Object[array.length];
-                newArray[i] = array[i];
-                System.arraycopy(newArray, index, array, index + 1, size);
-            }
-        }
+        ensureCapacity();
+        T value = array[index];
+        System.arraycopy(array, index + 1, array, index, array.length - index - 1);
+        array[size - 1] = null;
         size--;
-        return (T) array[index];
+        return value;
     }
 
     @Override
     public T get(int index) {
         validateIndex(index);
-        checkCapacity();
-        T value = array[index];
-        return value;
+        ensureCapacity();
+        return array[index];
     }
 
     @Override
     public T set(T value, int index) {
         validateIndex(index);
-        checkCapacity();
+        ensureCapacity();
         T oldValue = array[index];
         array[index] = value;
         return oldValue;
@@ -69,16 +69,13 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public boolean contains(T value) {
-        for (int i = 0; i < size; i++) {
-            return array[i].equals(value) ? true : false;
-        }
-        return true;
+        return indexOf(value) != -1;
     }
 
     @Override
     public int indexOf(T value) {
-        for (int i = 0; i < array.length - 1; i++) {
-            if (array[i].equals(value)) {
+        for (int i = 0; i < size; i++) {
+            if (Objects.equals(array[i], value)) {
                 return i;
             }
         }
@@ -95,12 +92,9 @@ public class ArrayList<T> implements List<T> {
         return -1;
     }
 
-    @Override//
+    @Override
     public boolean isEmpty() {
-        for (int i = 0; i < array.length - 1; i++) {
-            return Objects.equals(array[i], null) ? true : false;
-        }
-        return true;
+        return size == 0;
     }
 
     @Override
@@ -126,21 +120,31 @@ public class ArrayList<T> implements List<T> {
     }
 
     private void validateIndex(int index) {
-        if (index > array.length - 1 || index < 0) {
-            throw new IndexOutOfBoundsException("Index " + index + "has to be between 0 and size " + size);
+        if (index > size - 1 || index < 0) {
+            throw new IndexOutOfBoundsException("Index " + index + " must be between [ " + 0 + "," + (size - 1) + "]");
         }
     }
 
-    private void checkCapacity() {//+++ але провірить ленг -1 чи просто ленг
-        if (size == array.length) {
-            T[] newArray = (T[]) new Object[(int) array.length * DEFAULT_GROWTH_FACTOR + 1];
-            System.arraycopy(array, 0, newArray, 0, array.length - 1);
+    private void validateIndexForAdd(int index) {
+        if (index > size || index < 0) {
+            throw new IndexOutOfBoundsException("Index " + index + " must be between [ " + 0 + "," + size + "]");
+        }
+    }
+
+    private void ensureCapacity() {
+        if (size == getCapacity()) {
+            T[] newArray = (T[]) new Object[(int) (array.length * loadFactor)];
+            System.arraycopy(array, 0, newArray, 0, size);
             array = newArray;
         }
     }
 
+    int getCapacity() {
+        return array.length;
+    }
+
     @Override
-    public Iterator<T> getIterator() {
+    public Iterator<T> iterator() {
         return new ArrayListIterator();
     }
 
@@ -154,7 +158,7 @@ public class ArrayList<T> implements List<T> {
 
         @Override
         public T next() {
-            if (array[index] == null) {
+            if (!hasNext()) {
                 throw new NoSuchElementException("Next element is not exist");
             }
             return array[index++];
@@ -163,7 +167,7 @@ public class ArrayList<T> implements List<T> {
         @Override
         public void remove() {
             if (array[index] == null) {
-                throw new IllegalArgumentException("Element is not avalible");
+                throw new IllegalArgumentException("Element is not exist");
             } else if (array[index] != null) {//???
                 array[index] = null;
                 size--;
