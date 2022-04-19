@@ -1,10 +1,9 @@
 package com.bondarenko.datastructures.list;
 
-public class ArrayListTest extends AbstractListTest {
+public class ArrayListTest<T> extends AbstractListTest<T> {
 
     @Override
-    List getList() {
-        List list = new ArrayList();
-        return list;
+    List<String> getList() {
+        return new ArrayList<>();
     }
 }
