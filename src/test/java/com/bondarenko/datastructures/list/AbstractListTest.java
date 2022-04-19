@@ -153,7 +153,7 @@ public abstract class AbstractListTest<T> {
     }
 
     @Test
-    @DisplayName("receive Index Of The First  Occurrence Of Value")
+    @DisplayName("receive Index Of The First Occurrence Of Value")
     public void receiveIndexOfTheFirstOccurrenceOfValue() {
         //when
         list.add("A");
