@@ -17,13 +17,13 @@ public class ArrayList<T> implements List<T> {
         this(DEFAULT_INITIAL_CAPACITY, DEFAULT_GROWTH_FACTOR);
     }
 
-    public ArrayList(int DEFAULT_INITIAL_CAPACITY) {
-        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_GROWTH_FACTOR);
+    public ArrayList(int initialCapacity) {
+        this(initialCapacity, DEFAULT_GROWTH_FACTOR);
     }
 
-    public ArrayList(int DEFAULT_INITIAL_CAPACITY, double loadFactor) {
+    public ArrayList(int initialCapacity, double loadFactor) {
         this.loadFactor = loadFactor < 1 ? DEFAULT_GROWTH_FACTOR : loadFactor;
-        this.array = (T[]) new Object[DEFAULT_INITIAL_CAPACITY];
+        this.array = (T[]) new Object[initialCapacity];
     }
 
     @Override
@@ -175,3 +175,4 @@ public class ArrayList<T> implements List<T> {
         }
     }
 }
+
