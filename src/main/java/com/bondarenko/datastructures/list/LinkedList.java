@@ -30,11 +30,9 @@ public class LinkedList<T> implements List<T> {
             newNode.prev = last;
             last = newNode;
         } else {
-            Node<T> node = findByIndex(index);
+            Node<T> node = getNode(index);
             newNode.prev = node.prev;
             node.prev.next = node;
-            node = newNode;
-            newNode.next = node.next;
         }
         size++;
     }
@@ -42,7 +40,7 @@ public class LinkedList<T> implements List<T> {
     @Override
     public T remove(int index) {
         validateIndex(index);
-        Node<T> current = findByIndex(index);
+        Node<T> current = getNode(index);
         if (size == 1) {
             first = last = null;
         } else if (index == 0) {
@@ -62,13 +60,13 @@ public class LinkedList<T> implements List<T> {
     @Override
     public T get(int index) {
         validateIndex(index);
-        return findByIndex(index).value;
+        return getNode(index).value;
     }
 
     @Override
     public T set(T value, int index) {
         validateIndex(index);
-        Node<T> current = findByIndex(index);
+        Node<T> current = getNode(index);
         T oldValue = current.value;
         current.value = value;
         return oldValue;
@@ -89,7 +87,7 @@ public class LinkedList<T> implements List<T> {
     @Override
     public int lastIndexOf(T value) {
         Node<T> current = last;
-        for (int index = size - 1; index > 0; index--) {
+        for (int index = size - 1; index >= 0; index--) {
             if (Objects.equals(current.value, value)) {
                 return index;
             }
@@ -143,8 +141,8 @@ public class LinkedList<T> implements List<T> {
 
         @Override
         public T next() {
-            if (current == null) {
-                throw new NoSuchElementException("No more elements");
+            if (!hasNext()) {
+                throw new NoSuchElementException("Next element is not exist");
             }
             T value = current.value;
             current = current.next;
@@ -153,20 +151,28 @@ public class LinkedList<T> implements List<T> {
 
         @Override
         public void remove() {
-            if (current.next != null) {
-                last = current.prev;
-                current.prev.next = null;
-            } else {
-                throw new IllegalStateException("Element is not exist");
+            if (current == null) {
+                throw new IllegalStateException("The method next() not used previously");
             }
+            Node nodeBeforeRemoved = current.prev;
+            current.prev = current.next;
+            current.next = nodeBeforeRemoved;
             size--;
         }
     }
 
-    private Node<T> findByIndex(int index) {
-        Node<T> current = first;
-        for (int i = 0; i < index; i++) {
-            current = current.next;
+    private Node<T> getNode(int index) {
+        Node<T> current;
+        if (index < size / 2) {
+            current = first;
+            for (int i = 0; i < index; i++) {
+                current = current.next;
+            }
+        } else {
+            current = last;
+            for (int i = size - 1; i > index; i--) {
+                current = current.prev;
+            }
         }
         return current;
     }
