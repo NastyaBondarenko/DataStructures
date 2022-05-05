@@ -43,7 +43,6 @@ public class ArrayList<T> implements List<T> {
     @Override
     public T remove(int index) {
         validateIndex(index);
-        ensureCapacity();
         T value = array[index];
         System.arraycopy(array, index + 1, array, index, array.length - index - 1);
         array[size - 1] = null;
@@ -54,14 +53,12 @@ public class ArrayList<T> implements List<T> {
     @Override
     public T get(int index) {
         validateIndex(index);
-        ensureCapacity();
         return array[index];
     }
 
     @Override
     public T set(T value, int index) {
         validateIndex(index);
-        ensureCapacity();
         T oldValue = array[index];
         array[index] = value;
         return oldValue;
@@ -84,7 +81,7 @@ public class ArrayList<T> implements List<T> {
 
     @Override
     public int lastIndexOf(T value) {
-        for (int i = array.length - 1; i > 0; i--) {
+        for (int i = size - 1; i >= 0; i--) {
             if (Objects.equals(array[i], value)) {
                 return i;
             }
@@ -133,6 +130,7 @@ public class ArrayList<T> implements List<T> {
 
     private void ensureCapacity() {
         if (size == getCapacity()) {
+            @SuppressWarnings("unchected")
             T[] newArray = (T[]) new Object[(int) (array.length * loadFactor)];
             System.arraycopy(array, 0, newArray, 0, size);
             array = newArray;
@@ -149,11 +147,11 @@ public class ArrayList<T> implements List<T> {
     }
 
     private class ArrayListIterator implements Iterator<T> {
-        int index;
+        private int index;
 
         @Override
         public boolean hasNext() {
-            return index < array.length;
+            return index < size;
         }
 
         @Override
@@ -168,13 +166,12 @@ public class ArrayList<T> implements List<T> {
         public void remove() {
             if (array[index] == null) {
                 throw new IllegalArgumentException("Element is not exist");
-            } else if (array[index] != null) {//???
+            } else {
                 array[index] = null;
                 size--;
             }
         }
     }
-
 }
 
 
