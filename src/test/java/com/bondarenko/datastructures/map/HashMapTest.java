@@ -11,90 +11,247 @@ import static org.junit.jupiter.api.Assertions.*;
 public class HashMapTest {
 
     Map<String, String> map = new HashMap();
-    Iterator<Map.Entry<String, String>> iterator = map.iterator();
 
     @Test
-    @DisplayName("when Put By Not Null Key Then Value Should Be Returned By Inserted Key")
-    public void whenPutByNotNullKey_ThenValueShouldBeReturned_ByInsertedKey() {
+    @DisplayName("given Not Null Key When Put Then Size Should Be Equal To One And Value Should Be Equal To Inserted")
+    public void givenNotNullKey_WhenPutThenSize_ShouldBeEqualToOne_AndValueShouldBeEqual_ToInserted() {
+        map.put("key", "value");
+
+        assertEquals(1, map.size());
+        assertEquals("value", map.get("key"));
+    }
+
+    @Test
+    @DisplayName("When Put Then Size Should Be Equal To Size Of Keys And Get By Key Returns Corresponding Value")
+    public void givenMultipleNotNullKeys_WhenPutThenSizeShouldBeEqualToSizeOfKeys_AndGetByKey_ReturnsCorrespondingValue() {
         map.put("key1", "value1");
         map.put("key2", "value2");
 
+        assertEquals(2, map.size());
         assertEquals("value1", map.get("key1"));
         assertEquals("value2", map.get("key2"));
-        assertEquals(2, map.size());
     }
 
     @Test
-    @DisplayName("when Put Multiple Times By The Same Key then Value Should Be Updated To The Last")
-    public void whenPutSeveralTimes_byTheSameKey_thenValueShouldBeUpdated_ToTheLast() {
-        String key = "key";
-        String value1 = "value1";
-        String value2 = "value2";
-
-        map.put(key, value1);
-        map.put(key, value2);
-
-        assertEquals(value2, map.get(key));
-        assertEquals(1, map.size());
-    }
-
-    @Test
-    @DisplayName("when Put In Pair Where Previous Value Was Null ThenNull Returned")
-    public void whenPutInPair_WherePreviousValueWasNull_ThenNullReturned() {
-        map.put("key1", null);
-        assertNull(map.put("key1", "value1"));
-    }
-
-    @Test
-    @DisplayName("when Remove Last Pair Then Size Should Be Zero")
-    public void whenRemoveLastPair_ThenSizeShouldBeZero() {
-        map.put("key1", "value1");
-
-        map.remove("key1");
-
-        assertEquals(0, map.size());
-    }
-
-    @Test
-    @DisplayName("when Remove Sequentially In Not Empty Map Then Size  Sequentially Decrease")
-    public void whenRemoveSequentially_InNotEmptyMap_ThenSizeSequentiallyDecrease() {
+    @DisplayName("when put values by different keys then get by key returns corresponding value")
+    public void givenMultipleNodes_InSameBucket_WhenGetByExistingKey_ThenGetByKeyReturnsCorrespondingValue() {
         map.put("key1", "value1");
         map.put("key2", "value2");
+        map.put("key3", "value3");
 
-        assertEquals(2, map.size());
+        assertEquals(3, map.size());
+        assertEquals("value1", map.get("key1"));
+        assertEquals("value2", map.get("key2"));
+        assertEquals("value3", map.get("key3"));
+    }
 
-        map.remove("key1");
+    @Test
+    @DisplayName("update value when put by the same key")
+    public void givenNotNullKey_WhenPutMultipleTimesWithSameKey_ThenSizeShouldBeEqualToOne_AndValueShouldBeOverwrittenWithLast() {
+        map.put("key", "value1");
+        map.put("key", "value2");
+        map.put("key", "value3");
+
         assertEquals(1, map.size());
+        assertEquals("value3", map.get("key"));
+    }
 
-        map.remove("key2");
+    @Test
+    @DisplayName("when map is Empty then size equal  to zero")
+    public void whenMapIsEmpty_thenSizeIsZero() {
         assertEquals(0, map.size());
     }
 
     @Test
-    @DisplayName("when Remove By Not Existing Key In Not Empty Map Then Size Not Change")
-    public void whenRemoveByNotExistingKey_InNotEmptyMap_ThenSizeNotChange() {
-        map.put("key1", "value1");
+    @DisplayName("given Empty Map When Remove Then Size Should Be Equal To Zero")
+    public void givenEmptyMap_WhenRemove_ThenSizeShouldBeEqual_ToZero() {
+        map.remove("key");
+        assertEquals(0, map.size());
+
+    }
+
+    @Test
+    @DisplayName("given Not Empty Map When Remove Then Size Should Be Equal ToZero")
+    public void givenNotEmptyMap_WhenRemove_ThenSizeShould_BeEqualToZero() {
+        map.put("key", "value");
         assertEquals(1, map.size());
+
+        map.remove("key");
+        assertEquals(0, map.size());
+    }
+
+    @Test
+    @DisplayName("when Remove One By One Then Size Should Decrease After Each Removal ByOne")
+    public void givenNotEmptyMap_WhenRemoveOneByOne_ThenSizeShouldDecreaseAfterEachRemovalByOne() {
+        map.put("key1", "value1");
+        map.put("key2", "value2");
+        map.put("key3", "value3");
+
+        assertEquals(3, map.size());
+
+        map.remove("key1");
+        assertEquals(2, map.size());
 
         map.remove("key2");
         assertEquals(1, map.size());
+
+        map.remove("key3");
+        assertEquals(0, map.size());
     }
 
     @Test
-    @DisplayName("when Get By Not Existing Key the Null Return")
-    public void whenGetByNotExistingKey_thenNullReturn() {
+    @DisplayName("When Remove First Node Then Size Should Decrease By One")
+    public void givenNotEmptyMap_AndObjectsInSameBucket_WhenRemoveFirstNode_ThenSizeShouldDecreaseByOne() {
         map.put("key1", "value1");
+        map.put("key2", "value2");
+        map.put("key3", "value3");
+        map.put("key4", "value4");
 
-        assertEquals(null, map.get("not existing key"));
+        assertEquals(4, map.size());
+
+        map.remove("key2");
+        assertEquals(3, map.size());
     }
 
     @Test
-    @DisplayName("when Put In Pair Where Previous Value Was Null Then Null Should Be Returned")
-    public void whenRemovePair_WithNullValue_ThenNullShouldBeReturned() {
-        map.put("key1", null);
-        map.remove("key1");
+    @DisplayName("When Remove Last Node Then Size Should Decrease By One")
+    public void givenNotEmptyMap_AndObjectsInSameBucket_WhenRemoveLastNodeThenSizeShouldDecreaseByOne() {
+        map.put("key1", "value1");
+        map.put("key2", "value2");
+        map.put("key3", "value3");
+        map.put("key4", "value4");
 
-        assertEquals(null, map.remove("key1"));
+        assertEquals(4, map.size());
+
+        map.remove("key4");
+        assertEquals(3, map.size());
+    }
+
+    @Test
+    @DisplayName("When Remove Node In The Middle Then Size Should Decrease By One")
+    public void givenNotEmptyMapAndObjectsInSameBucket_WhenRemoveNodeInTheMiddle_ThenSizeShouldDecreaseByOne() {
+        map.put("key1", "value1");
+        map.put("key2", "value2");
+        map.put("key3", "value3");
+        map.put("key4", "value4");
+
+        assertEquals(4, map.size());
+
+        map.remove("key3");
+        assertEquals(3, map.size());
+    }
+
+    @Test
+    @DisplayName("given Empty Map When Contains Null Key Then False Should Be Returned")
+    public void givenEmptyMap_WhenContainsNullKey_ThenFalseShouldBeReturned() {
+        assertFalse(map.containsKey(null));
+    }
+
+    @Test
+    @DisplayName("given Empty Map When Contains Not Null Key Then False Should Be Returned")
+    public void givenEmptyMap_WhenContainsNotNullKey_ThenFalseShouldBeReturned() {
+        assertFalse(map.containsKey("key"));
+    }
+
+    @Test
+    @DisplayName("given Map With Existing Null Key When Contains Null Key Then True Should Be Returned")
+    public void givenMapWithExistingNullKey_WhenContainsNullKey_ThenTrueShouldBeReturned() {
+        map.put(null, "value");
+
+        assertTrue(map.containsKey(null));
+    }
+
+    @Test
+    @DisplayName("given Map With Not Existing Null Key When Contains Null Key Then False Should Be Returned")
+    public void givenMapWithNotExistingNullKey_WhenContainsNullKey_ThenFalseShouldBeReturned() {
+        map.put("key", "value");
+
+        assertFalse(map.containsKey(null));
+    }
+
+    @Test
+    @DisplayName("given Not Existing Key When Contains Key Then False Should Be Returned")
+    public void givenNotExistingKey_WhenContainsKey_ThenFalseShouldBeReturned() {
+        map.put("key", "value");
+
+        assertTrue(map.containsKey("key"));
+    }
+
+    @Test
+    @DisplayName("given Not Empty Map When Iterator Has Next Then Should Return True")
+    public void givenNotEmptyMap_WhenIteratorHasNext_ThenShouldReturnTrue() {
+        map.put("key", "value");
+
+        Iterator<Map.Entry<String, String>> iterator = map.iterator();
+        assertTrue(iterator.hasNext());
+        assertTrue(iterator.hasNext());
+
+        map.remove("key");
+        assertFalse(iterator.hasNext());
+
+        map.put("key", "value");
+        assertFalse(iterator.hasNext());
+    }
+
+    @Test
+    @DisplayName("given Map With One Element When Iterator Next Then Iterator Has Next Should Return False")
+    public void givenMapWithOneElement_WhenIteratorNext_ThenIteratorHasNext_ShouldReturnFalse() {
+        map.put("key", "value");
+
+        Iterator<Map.Entry<String, String>> iterator = map.iterator();
+
+        assertTrue(iterator.hasNext());
+        iterator.next();
+        assertFalse(iterator.hasNext());
+    }
+
+    @Test
+    @DisplayName("given Iterator When Remove Called After Next Then Size Should Be Decreased By One And Map Should NotContainKey")
+    public void givenIterator_WhenRemoveCalledAfterNext_ThenSizeShouldBeDecreased_ByOne_AndMapShouldNotContainKey() {
+        String key = "key";
+        map.put(key, "value");
+        assertEquals(1, map.size());
+
+        Iterator<Map.Entry<String, String>> iterator = map.iterator();
+        iterator.next();
+        iterator.remove();
+
+        assertEquals(0, map.size());
+    }
+
+    @Test
+    @DisplayName("when Add Value then Value Is Present")
+    public void whenAddValue_thenValueIsPresent() {
+        map.put("key1", "value1");
+        Iterator<Map.Entry<String, String>> iterator = map.iterator();
+
+        assertTrue(iterator.hasNext());
+    }
+
+    @Test
+    @DisplayName("when Map Is Empty Then Size Is Zero")
+    public void whenMapIsEmpty_ThenSizeIsZero() {
+        assertEquals(0, map.size());
+    }
+
+    @Test
+    @DisplayName("when Map Is Empty Then Size Is Zero")
+    public void whenMapHasOnlyOnePair_ThenSizeIsOne() {
+        map.put("key1", "value1");
+        assertEquals(1, map.size());
+    }
+
+    @Test
+    @DisplayName("when Map Is Empty then Return True")
+    public void whenMapIsEmpty_thenReturnTrue() {
+        assertTrue(map.isEmpty());
+    }
+
+    @Test
+    @DisplayName("when Map Is Not Empty then Return False")
+    public void whenMapIsNotEmpty_thenReturnFalse() {
+        map.put("key2", "value3");
+        assertFalse(map.isEmpty());
     }
 
     @Test
@@ -126,7 +283,6 @@ public class HashMapTest {
     @Test
     @DisplayName("when Remove By Not Existing Key then Size Is Not Change ")
     public void whenRemoveByNotExistingKey_thenSizeIsNotChange() {
-        Map<String, String> map = new HashMap<>();
         map.put("key1", "value1");
 
         assertEquals(1, map.size());
@@ -158,40 +314,6 @@ public class HashMapTest {
     }
 
     @Test
-    @DisplayName("when Map Is Empty Then Size Is Zero")
-    public void whenMapIsEmpty_ThenSizeIsZero() {
-        assertEquals(0, map.size());
-    }
-
-    @Test
-    @DisplayName("when Map Is Empty Then Size Is Zero")
-    public void whenMapHasOnlyOnePair_ThenSizeIsOne() {
-        map.put("key1", "value1");
-        assertEquals(1, map.size());
-    }
-
-    @Test
-    @DisplayName("when Exist Several Pairs Then Size Is Appropriate")
-    public void whenExistSeveralPairs_ThenSizeIsAppropriate() {
-        map.put("key1", "value1");
-        map.put("key2", "value2");
-        assertEquals(2, map.size());
-    }
-
-    @Test
-    @DisplayName("when Map Is Empty then Return True")
-    public void whenMapIsEmpty_thenReturnTrue() {
-        assertTrue(map.isEmpty());
-    }
-
-    @Test
-    @DisplayName("when Map Is Not Empty then Return False")
-    public void whenMapIsNotEmpty_thenReturnFalse() {
-        map.put("key2", "value3");
-        assertFalse(map.isEmpty());
-    }
-
-    @Test
     @DisplayName("whenGet By Existing Key then Get By Key Returns Corresponding Value()")
     public void whenGetByExistingKey_thenGetByKeyReturnsCorrespondingValue() {
         map.put("key1", "value1");
@@ -205,23 +327,11 @@ public class HashMapTest {
     }
 
     @Test
-    @DisplayName("when Map Is Empty then Value is Not Exist")
-    public void whenMapIsEmpty_thenValue_isNotExist() {
-        assertFalse(map.iterator().hasNext());
-    }
-
-    @Test
-    @DisplayName("when Add Value then Value Is Present")
-    public void whenAddValue_thenValueIsPresent() {
-        map.put("key1", "value1");
-        assertTrue(iterator.hasNext());
-    }
-
-    @Test
     @DisplayName("when Remove Value then Value Is Removed")
     public void whenRemoveValue_thenValueIsRemoved() {
         map.put("key1", "value1");
         map.put("key2", "value2");
+        Iterator<Map.Entry<String, String>> iterator = map.iterator();
 
         Map.Entry<String, String> e1 = iterator.next();
         Map.Entry<String, String> e2 = iterator.next();
@@ -238,6 +348,8 @@ public class HashMapTest {
         map.put("key1", "value1");
         map.put("key2", "value2");
 
+        Iterator<Map.Entry<String, String>> iterator = map.iterator();
+
         Map.Entry<String, String> e1 = iterator.next();
         Map.Entry<String, String> e2 = iterator.next();
 
@@ -251,6 +363,8 @@ public class HashMapTest {
         map.put("key1", "value1");
         map.put("key2", "value2");
 
+        Iterator<Map.Entry<String, String>> iterator = map.iterator();
+
         assertTrue(iterator.hasNext());
         iterator.hasNext();
         assertTrue(iterator.hasNext());
@@ -260,6 +374,8 @@ public class HashMapTest {
     @DisplayName("when Iterator Next then Iterator Has Next Should Returned False")
     public void whenIteratorNext_thenIteratorHasNextShouldReturnedFalse() {
         map.put("key1", "value1");
+
+        Iterator<Map.Entry<String, String>> iterator = map.iterator();
 
         assertTrue(iterator.hasNext());
         iterator.next();
@@ -272,6 +388,8 @@ public class HashMapTest {
         map.put("key1", "value1");
         map.put("key2", "value2");
 
+        Iterator<Map.Entry<String, String>> iterator = map.iterator();
+
         assertTrue(iterator.hasNext());
         assertTrue(iterator.hasNext());
     }
@@ -279,9 +397,13 @@ public class HashMapTest {
     @Test
     @DisplayName("when Remove Without Next then Array Index Out Of Bounds Exception")
     public void whenRemoveWithoutNext_thenArrayIndexOutOfBoundsException() {
-        Assertions.assertThrows(ArrayIndexOutOfBoundsException.class, () -> {
+        Assertions.assertThrows(IllegalStateException.class, () -> {
+
             map.put("key1", "value1");
+
             assertEquals(1, map.size());
+
+            Iterator<Map.Entry<String, String>> iterator = map.iterator();
 
             iterator.remove();
         });
@@ -291,6 +413,9 @@ public class HashMapTest {
     @DisplayName("when Remove Called After Next then Size Should Be Decreased and Map Not Contains Key")
     public void whenRemoveCalledAfterNext_thenSizeShouldBeDecreased_andMapNotContainsKey() {
         map.put("key1", "value1");
+
+        Iterator<Map.Entry<String, String>> iterator = map.iterator();
+
         assertEquals(1, map.size());
 
         iterator.next();
@@ -299,3 +424,11 @@ public class HashMapTest {
         assertEquals(0, map.size());
     }
 }
+
+
+
+
+
+
+
+
