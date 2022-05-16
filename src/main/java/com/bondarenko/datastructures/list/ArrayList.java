@@ -21,6 +21,7 @@ public class ArrayList<T> implements List<T> {
         this(initialCapacity, DEFAULT_GROWTH_FACTOR);
     }
 
+    @SuppressWarnings("unchecked")
     public ArrayList(int initialCapacity, double loadFactor) {
         this.loadFactor = loadFactor < 1 ? DEFAULT_GROWTH_FACTOR : loadFactor;
         this.array = (T[]) new Object[initialCapacity];
@@ -44,7 +45,7 @@ public class ArrayList<T> implements List<T> {
     public T remove(int index) {
         validateIndex(index);
         T value = array[index];
-        System.arraycopy(array, index + 1, array, index, array.length - index - 1);
+        System.arraycopy(array, index + 1, array, index, size - index - 1);
         array[size - 1] = null;
         size--;
         return value;
@@ -110,8 +111,8 @@ public class ArrayList<T> implements List<T> {
     @Override
     public String toString() {
         StringJoiner stringJoiner = new StringJoiner(",", "[", "]");
-        for (int i = 0; i < size; i++) {
-            stringJoiner.add(String.valueOf(array[i]));
+        for (T array : this) {
+            stringJoiner.add(String.valueOf(array));
         }
         return stringJoiner.toString();
     }
@@ -130,8 +131,8 @@ public class ArrayList<T> implements List<T> {
 
     private void ensureCapacity() {
         if (size == getCapacity()) {
-            @SuppressWarnings("unchected")
-            T[] newArray = (T[]) new Object[(int) (array.length * loadFactor)];
+            @SuppressWarnings("unchecked")
+            T[] newArray = (T[]) new Object[(int) (size * loadFactor)];
             System.arraycopy(array, 0, newArray, 0, size);
             array = newArray;
         }
@@ -148,6 +149,7 @@ public class ArrayList<T> implements List<T> {
 
     private class ArrayListIterator implements Iterator<T> {
         private int index;
+        private boolean cantRemove;
 
         @Override
         public boolean hasNext() {
@@ -164,12 +166,11 @@ public class ArrayList<T> implements List<T> {
 
         @Override
         public void remove() {
-            if (array[index] == null) {
-                throw new IllegalArgumentException("Element is not exist");
-            } else {
-                array[index] = null;
-                size--;
+            if (cantRemove) {
+                throw new IllegalStateException("Method next() has not called before remove");
             }
+            array[index] = null;
+            size--;
         }
     }
 }
