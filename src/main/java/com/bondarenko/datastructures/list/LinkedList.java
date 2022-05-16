@@ -41,19 +41,7 @@ public class LinkedList<T> implements List<T> {
     public T remove(int index) {
         validateIndex(index);
         Node<T> current = getNode(index);
-        if (size == 1) {
-            first = last = null;
-        } else if (index == 0) {
-            first.next.prev = null;
-            first = first.next;
-        } else if (index == size - 1) {
-            last.prev.next = null;
-            last = last.prev;
-        } else {
-            current.prev.next = current.next;
-            current.next.prev = current.prev;
-        }
-        size--;
+        removeNode(current);
         return current.value;
     }
 
@@ -133,6 +121,7 @@ public class LinkedList<T> implements List<T> {
 
     private class LinkedListIterator implements Iterator<T> {
         private Node<T> current = first;
+        private boolean remove;
 
         @Override
         public boolean hasNext() {
@@ -146,18 +135,17 @@ public class LinkedList<T> implements List<T> {
             }
             T value = current.value;
             current = current.next;
+            remove = true;
             return value;
         }
 
         @Override
         public void remove() {
-            if (current == null) {
+            if (!remove) {
                 throw new IllegalStateException("The method next() not used previously");
             }
-            Node nodeBeforeRemoved = current.prev;
-            current.prev = current.next;
-            current.next = nodeBeforeRemoved;
-            size--;
+            removeNode(current);
+            remove=false;
         }
     }
 
@@ -175,6 +163,24 @@ public class LinkedList<T> implements List<T> {
             }
         }
         return current;
+    }
+
+    private void removeNode(Node<T> node) {
+        if (size == 1) {
+            first = last = null;
+        } else if (node == first) {
+            first.prev = null;
+            first = node.next;
+        } else if (node == last) {
+            last = node.prev;
+            last.next = null;
+        } else {
+            Node<T> prevNode = node.prev;
+            Node<T> nextNode = node.next;
+            prevNode.next = nextNode;
+            nextNode.prev = prevNode;
+        }
+        size--;
     }
 
     private void validateIndexForAdd(int index) {
