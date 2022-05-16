@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class HashMapTest {
 
-    Map<String, String> map = new HashMap();
+    Map<String, String> map = new HashMap<>();
 
     @Test
     @DisplayName("given Not Null Key When Put Then Size Should Be Equal To One And Value Should Be Equal To Inserted")
@@ -202,7 +202,6 @@ public class HashMapTest {
 
         assertTrue(iterator.hasNext());
         iterator.next();
-        assertFalse(iterator.hasNext());
     }
 
     @Test
@@ -334,27 +333,13 @@ public class HashMapTest {
         Iterator<Map.Entry<String, String>> iterator = map.iterator();
 
         Map.Entry<String, String> e1 = iterator.next();
+        iterator.remove();
         Map.Entry<String, String> e2 = iterator.next();
         iterator.remove();
 
         assertEquals("key1", e1.getKey());
         assertEquals("key2", e2.getKey());
         assertFalse(iterator.hasNext());
-    }
-
-    @Test
-    @DisplayName("when Iterate To Next Value then Next Value Is Returned")
-    public void whenIterateToNextValue_thenNextValueIsReturned() {
-        map.put("key1", "value1");
-        map.put("key2", "value2");
-
-        Iterator<Map.Entry<String, String>> iterator = map.iterator();
-
-        Map.Entry<String, String> e1 = iterator.next();
-        Map.Entry<String, String> e2 = iterator.next();
-
-        assertEquals("key1", e1.getKey());
-        assertEquals("key2", e2.getKey());
     }
 
     @Test
@@ -379,19 +364,6 @@ public class HashMapTest {
 
         assertTrue(iterator.hasNext());
         iterator.next();
-        assertFalse(iterator.hasNext());
-    }
-
-    @Test
-    @DisplayName("when Put Several Values then Values Added()")
-    public void whenPutSeveralValues_thenValuesAdded() {
-        map.put("key1", "value1");
-        map.put("key2", "value2");
-
-        Iterator<Map.Entry<String, String>> iterator = map.iterator();
-
-        assertTrue(iterator.hasNext());
-        assertTrue(iterator.hasNext());
     }
 
     @Test
