@@ -131,6 +131,7 @@ public class HashMap<K, V> implements Map<K, V> {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     private void growCapacity() {
         ArrayList<Entry<K, V>>[] newBuckets = new ArrayList[(int) (buckets.length * growFactor)];
         for (ArrayList<Entry<K, V>> newBucket : newBuckets) {
