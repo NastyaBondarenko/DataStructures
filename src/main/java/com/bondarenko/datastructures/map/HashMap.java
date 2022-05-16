@@ -15,6 +15,7 @@ public class HashMap<K, V> implements Map<K, V> {
     private double growFactor;
     private double loadFactor;
 
+    @SuppressWarnings("unchecked")
     public HashMap(int capacity, double growFactor, double loadFactor) {
         this.growFactor = growFactor;
         this.loadFactor = loadFactor;
@@ -42,9 +43,6 @@ public class HashMap<K, V> implements Map<K, V> {
 
     @Override
     public V remove(K key) {
-        if (key == null) {
-            throw new NullPointerException("Key is not exist");
-        }
         Entry<K, V> entry = removeEntry(key);
         if (entry == null) {
             return null;
@@ -54,9 +52,6 @@ public class HashMap<K, V> implements Map<K, V> {
 
     @Override
     public V get(K key) {
-        if (key == null) {
-            throw new NullPointerException("Key is not exist");
-        }
         Entry<K, V> entry = getEntry(key);
         if (entry != null) {
             return entry.getValue();
@@ -153,13 +148,13 @@ public class HashMap<K, V> implements Map<K, V> {
         return new HashMapIterator();
     }
 
-    public class HashMapIterator implements Iterator<Map.Entry<K, V>> {
+    private class HashMapIterator implements Iterator<Map.Entry<K, V>> {
         private int bucketIndex;
-        Iterator<Entry<K, V>> bucketIterator;
-        boolean changeOfBucketIndexIndicator;
+        private Iterator<Entry<K, V>> bucketIterator;
+        private boolean changeOfBucketIndexIndicator;
 
-        HashMapIterator() {
-            while (buckets[bucketIndex] == null && bucketIndex < buckets.length) {
+        private HashMapIterator() {
+            while (buckets[bucketIndex] == null) {
                 bucketIndex++;
             }
             bucketIterator = buckets[bucketIndex].iterator();
@@ -201,15 +196,16 @@ public class HashMap<K, V> implements Map<K, V> {
             if (!hasNext()) {
                 throw new NoSuchElementException("Next element is not exist");
             }
-            Entry<K, V> entry = bucketIterator.next();
-            return entry;
+            changeOfBucketIndexIndicator = true;
+            return bucketIterator.next();
         }
 
         @Override
         public void remove() {
-            if (changeOfBucketIndexIndicator = false) {
+            if (!changeOfBucketIndexIndicator) {
                 throw new IllegalStateException("Method next() has not called before remove");
             }
+            changeOfBucketIndexIndicator = false;
             bucketIterator.remove();
             size--;
         }
@@ -219,7 +215,7 @@ public class HashMap<K, V> implements Map<K, V> {
         private K key;
         private V value;
 
-        public Entry(K key, V value) {
+        private Entry(K key, V value) {
             this.key = key;
             this.value = value;
         }
