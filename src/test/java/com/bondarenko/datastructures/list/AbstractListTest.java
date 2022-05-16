@@ -256,14 +256,15 @@ public abstract class AbstractListTest<T> {
     @Test
     @DisplayName("test Iterator Remove")
     public void testIteratorRemove() {
-
-        Iterator<String> iterator = list.iterator();
         assertEquals(3, list.size());
-        assertTrue(iterator.hasNext());
+        Iterator<String> iterator = list.iterator();
+        //when
         iterator.next();
-
         iterator.remove();
-        assertEquals(2, list.size());
+        iterator.next();
+        iterator.remove();
+        //then
+        assertEquals(1, list.size());
     }
 
     @Test
