@@ -111,8 +111,8 @@ public class ArrayList<T> implements List<T> {
     @Override
     public String toString() {
         StringJoiner stringJoiner = new StringJoiner(",", "[", "]");
-        for (T array : this) {
-            stringJoiner.add(String.valueOf(array));
+        for (T value : this) {
+            stringJoiner.add(String.valueOf(value));
         }
         return stringJoiner.toString();
     }
@@ -149,7 +149,7 @@ public class ArrayList<T> implements List<T> {
 
     private class ArrayListIterator implements Iterator<T> {
         private int index;
-        private boolean cantRemove;
+        private boolean remove;
 
         @Override
         public boolean hasNext() {
@@ -161,14 +161,16 @@ public class ArrayList<T> implements List<T> {
             if (!hasNext()) {
                 throw new NoSuchElementException("Next element is not exist");
             }
+            remove = true;
             return array[index++];
         }
 
         @Override
         public void remove() {
-            if (cantRemove) {
+            if (!remove) {
                 throw new IllegalStateException("Method next() has not called before remove");
             }
+            remove = false;
             array[index] = null;
             size--;
         }
