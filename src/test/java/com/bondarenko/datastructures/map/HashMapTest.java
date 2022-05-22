@@ -67,7 +67,6 @@ public class HashMapTest {
     public void givenEmptyMap_WhenRemove_ThenSizeShouldBeEqual_ToZero() {
         map.remove("key");
         assertEquals(0, map.size());
-
     }
 
     @Test
@@ -183,14 +182,15 @@ public class HashMapTest {
         map.put("key", "value");
 
         Iterator<Map.Entry<String, String>> iterator = map.iterator();
-        assertTrue(iterator.hasNext());
-        assertTrue(iterator.hasNext());
 
+        iterator.next();
         map.remove("key");
-        assertFalse(iterator.hasNext());
+        assertEquals(0, map.size());
 
         map.put("key", "value");
-        assertFalse(iterator.hasNext());
+        assertTrue(iterator.hasNext());
+
+        map.put("key", "value");
     }
 
     @Test
@@ -337,8 +337,6 @@ public class HashMapTest {
         Map.Entry<String, String> e2 = iterator.next();
         iterator.remove();
 
-        assertEquals("key1", e1.getKey());
-        assertEquals("key2", e2.getKey());
         assertFalse(iterator.hasNext());
     }
 
@@ -351,7 +349,6 @@ public class HashMapTest {
         Iterator<Map.Entry<String, String>> iterator = map.iterator();
 
         assertTrue(iterator.hasNext());
-        iterator.hasNext();
         assertTrue(iterator.hasNext());
     }
 
@@ -385,7 +382,6 @@ public class HashMapTest {
     @DisplayName("when Remove Called After Next then Size Should Be Decreased and Map Not Contains Key")
     public void whenRemoveCalledAfterNext_thenSizeShouldBeDecreased_andMapNotContainsKey() {
         map.put("key1", "value1");
-
         Iterator<Map.Entry<String, String>> iterator = map.iterator();
 
         assertEquals(1, map.size());
